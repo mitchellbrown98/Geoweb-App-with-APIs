@@ -25,7 +25,11 @@ Session(app)
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    info=[]
+    info.append("none")
+    info.append("none")
+
+    return render_template("index.html", info=info)
 
 @app.route("/search", methods=["POST"])
 def search():
@@ -44,4 +48,10 @@ def search():
     rep = res.json()
     rep2=rep['features']
 
-    return render_template("index.html", rep2=rep2)
+    #send date info for results
+    info=[]
+    info.append(sd)
+    info.append(ed)
+
+
+    return render_template("index.html", rep2=rep2, info=info)

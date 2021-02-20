@@ -57,6 +57,13 @@
         padding: 20px;
         text-align: center;
       }
+      #btn-spin {
+        position: absolute;
+        left: 200px;
+        z-index: 10;
+        font-size: 1.5em;
+        z-index: 3000;
+      }
 </style>
 
   </head>
@@ -70,21 +77,21 @@
           <h3> Search for building permits by issued date: </h3><br>
           <h3> Start Date</h3>
           <form action="{{ url_for('search') }}" method="post">
-            <input id="datepicker" name="datepicker" width="150" />
+            <input id="datepicker" name="datepicker" width="340"  /><br>
             <h3> End Date</h3>
-            <input id="datepicker2" name="datepicker2" width="150" /><br>
+            <input id="datepicker2" name="datepicker2" width="340" /><br>
             <input type="submit" class="btn btn-outline-dark btn active" onclick="checkdate();" role="button" id="search" value="Search" />
           </form>
-
               <p3>Please enter an END DATE that is later than the START DATE</p3>
-
+              <br><br>
+              Currently viewing <b> <span id="results"></span> </b> results:<br> <b>From:</b> {{ info[0] }}<br> <b>To:</b> {{ info[1] }}
         </div>
       </div>
 
 <script>
-
 $('#datepicker').datepicker({ format: 'yyyy-mm-dd' });
 $('#datepicker2').datepicker({ format: 'yyyy-mm-dd' });
+var totalresults=0;
 
 //Hide error msg by default
 $("p3").hide();
@@ -96,14 +103,14 @@ map.locate({setView: true, maxZoom: 11});
 //Add tilelayer to map
 L.tileLayer('https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png?api_key=30b6c838-4624-47eb-964a-87fcc2e3eb39', {maxZoom: 20, attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'}).addTo(map);
 
-      //Create cluster groups
-      var markerCollection = L.markerClusterGroup({
-      	spiderfyOnMaxZoom: true,
-	       showCoverageOnHover: false,
-        disableClusteringAtZoom: 21
-      });
+//Create cluster groups and add settings
+    var markerCollection = L.markerClusterGroup({
+      spiderfyOnMaxZoom: true,
+	    showCoverageOnHover: false,
+      disableClusteringAtZoom: 21
+    });
 
-  //remove layers if new data comes from search
+  //remove and clear layers if new data comes from search
 if (markerCollection != undefined) {
      markerCollection.clearLayers();
      map.removeLayer(markerCollection);
@@ -133,10 +140,10 @@ if (markerCollection != undefined) {
   {% endif %}
 {% endfor %}
 
-//Add cluster layer to map
+//Add cluster layer to map and determine total number of results to display
+totalresults = markerCollection.getLayers().length;
+document.getElementById("results").innerHTML = totalresults;
 map.addLayer(markerCollection);
-
-
 
 
 //Function to bind popup to each geojson feature
@@ -146,20 +153,18 @@ function onEachFeature(feature, layer) {
                         '<br><b>Address: </b>' + feature.properties.Address);
 }
 
-      //Function used to check if the filter dates are correct
-      function checkdate (){
-      let d1 = $( "#datepicker" ).datepicker().val()
-      let d2 = $( "#datepicker2" ).datepicker().val()
-      console.log(d1);
-      console.log(d2);
-        if (d1 >= d2){
-          $("p3").show();
-          event.preventDefault();
-        }
+//Function used to check if the filter dates are correct
+  function checkdate (){
+    let d1 = $( "#datepicker" ).datepicker().val()
+    let d2 = $( "#datepicker2" ).datepicker().val()
+      if (d1 >= d2){
+        $("p3").show();
+        event.preventDefault();
       }
+    }
 
 
-    </script>
+  </script>
 
   </body>
 </html>
