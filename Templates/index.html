@@ -98,9 +98,9 @@ L.tileLayer('https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png?ap
 
       //Create cluster groups
       var markerCollection = L.markerClusterGroup({
-      	spiderfyOnMaxZoom: false,
-	    showCoverageOnHover: false,
-        disableClusteringAtZoom: 18
+      	spiderfyOnMaxZoom: true,
+	       showCoverageOnHover: false,
+        disableClusteringAtZoom: 21
       });
 
   //remove layers if new data comes from search
@@ -109,49 +109,28 @@ if (markerCollection != undefined) {
      map.removeLayer(markerCollection);
 };
 
-var ftype;
-var gtype;
-var coords;
-var issued;
-var workclassgroup;
-var contractorname;
-var communityname;
-var originaladdress;
-
-
 //Import all geojson items and add to layer if they have a geometry type!
 {% for dict_item in rep2 %}
   {% if dict_item['geometry']['type'] is defined %}
-  ftype = "{{dict_item['type']}}"
-  gtype = "{{dict_item['geometry']['type']}}"
-  coords = {{dict_item['geometry']['coordinates']}}
-  issued = "{{dict_item['properties']['issueddate']}}".slice(0, 10);
-  workclassgroup = "{{dict_item['properties']['workclassgroup']}}"
-  contractorname = "{{dict_item['properties']['contractorname']}}"
-  communityname = "{{dict_item['properties']['communityname']}}"
-  originaladdress = "{{dict_item['properties']['originaladdress']}}"
-  {% endif %}
-
-
-        var geojsonFeature= { "type": ftype,
+        var geojsonFeature= { "type": "{{dict_item['type']}}",
           "properties": {
-            "Issued": issued,
-            "WorkClassGroup": workclassgroup,
-            "Contractor": contractorname,
-            "Community": communityname,
-            "Address": originaladdress
+            "Issued": "{{dict_item['properties']['issueddate']}}".slice(0, 10),
+            "WorkClassGroup": "{{dict_item['properties']['workclassgroup']}}",
+            "Contractor": "{{dict_item['properties']['contractorname']}}",
+            "Community": "{{dict_item['properties']['communityname']}}",
+            "Address": "{{dict_item['properties']['originaladdress']}}"
           },
           "geometry":{
-            "type": gtype,
-            "coordinates": coords
+            "type": "{{dict_item['geometry']['type']}}",
+            "coordinates": {{dict_item['geometry']['coordinates']}}
           }
         };
 
       var geo =  L.geoJSON(geojsonFeature, {
           onEachFeature: onEachFeature
         });
-
       markerCollection.addLayer(geo);
+  {% endif %}
 {% endfor %}
 
 //Add cluster layer to map
