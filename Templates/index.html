@@ -89,7 +89,6 @@ $('#datepicker2').datepicker({ format: 'yyyy-mm-dd' });
 //Hide error msg by default
 $("p3").hide();
 
-
 //Initialize map, set view to center of calgary if location permissions //denied
 var map = L.map('map').setView([51.044, -114.07],11);
 map.locate({setView: true, maxZoom: 11});
@@ -104,20 +103,47 @@ L.tileLayer('https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png?ap
         disableClusteringAtZoom: 18
       });
 
+  //remove layers if new data comes from search
+if (markerCollection != undefined) {
+     markerCollection.clearLayers();
+     map.removeLayer(markerCollection);
+};
 
-//Import all geojson items and add to layer
+var ftype;
+var gtype;
+var coords;
+var issued;
+var workclassgroup;
+var contractorname;
+var communityname;
+var originaladdress;
+
+
+//Import all geojson items and add to layer if they have a geometry type!
 {% for dict_item in rep2 %}
-        var geojsonFeature= { "type": "{{dict_item['type']}}",
+  {% if dict_item['geometry']['type'] is defined %}
+  ftype = "{{dict_item['type']}}"
+  gtype = "{{dict_item['geometry']['type']}}"
+  coords = {{dict_item['geometry']['coordinates']}}
+  issued = "{{dict_item['properties']['issueddate']}}".slice(0, 10);
+  workclassgroup = "{{dict_item['properties']['workclassgroup']}}"
+  contractorname = "{{dict_item['properties']['contractorname']}}"
+  communityname = "{{dict_item['properties']['communityname']}}"
+  originaladdress = "{{dict_item['properties']['originaladdress']}}"
+  {% endif %}
+
+
+        var geojsonFeature= { "type": ftype,
           "properties": {
-            "Issued": "{{dict_item['properties']['issueddate']}}",
-            "WorkClassGroup": "{{dict_item['properties']['workclassgroup']}}",
-            "Contractor": "{{dict_item['properties']['contractorname']}}",
-            "Community": "{{dict_item['properties']['communityname']}}",
-            "Address": "{{dict_item['properties']['originaladdress']}}"
+            "Issued": issued,
+            "WorkClassGroup": workclassgroup,
+            "Contractor": contractorname,
+            "Community": communityname,
+            "Address": originaladdress
           },
           "geometry":{
-            "type": "{{dict_item['geometry']['type']}}",
-            "coordinates": {{dict_item['geometry']['coordinates']}}
+            "type": gtype,
+            "coordinates": coords
           }
         };
 
