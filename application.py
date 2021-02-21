@@ -41,8 +41,6 @@ def search():
     ed = enddate.replace("/", "-")
     url = "https://data.calgary.ca/resource/c2es-76ed.geojson?$where=issueddate > " + "'" + sd + "' " + "and issueddate < " + "'" + ed + "'"
 
-    urltest= "https://data.calgary.ca/resource/c2es-76ed.geojson?$where=issueddate > '2020-01-21' and issueddate < '2020-01-23'"
-
     res = requests.get(url)
     #convert the response to a Json object
     rep = res.json()
