@@ -1,3 +1,5 @@
+In this project I built a web mapping application about building permits in Calgary. Users can filter and visualize building permits in Calgary in a mapping front-end.
+
 **Application.py:**
 There are only 2 routes in this file.
 
